@@ -4,8 +4,8 @@ from random import randint, choice, shuffle
 import pyperclip
 import json
 
-FONT = ("Times of New Roman",12)
-ENTRY_FONT = ("Times of New Roman",10)
+NORMAL_FONT = ("Times of New Roman", 12)
+ENTRY_TEXT_FONT = ("Times of New Roman", 10)
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 def generate_password():
@@ -66,6 +66,27 @@ def save():
                 website_text.delete(0,END)
                 password_text.delete(0,END)
 
+# ---------------------------- FIND PASSWORD ------------------------------- #
+
+def find_password():
+    website = website_text.get()
+
+    try:
+        with open("data.json", "r") as data_file:
+            data = json.load(data_file)
+    except FileNotFoundError:
+        messagebox.showwarning(title="Warning", message="No Data File Found.\nEnter Some data First.")
+    else:
+        if website in data:
+            email = data[website]["email"]
+            password = data[website]["password"]
+            messagebox.showinfo(title=website, message=f"Email id is : {email}\n"
+                                                       f"Password is : {password}")
+        else:
+            messagebox.showerror(title=website, message=f"No details for {website} exist.")
+    finally:
+        website_text.delete(0,END)
+
 # ---------------------------- UI SETUP ------------------------------- #
 
 window = Tk()
@@ -79,27 +100,29 @@ canvas.create_image(100,100, image=lock_img)
 canvas.grid(column=1, row=0)
 
 # Label
-website_label = Label(text ="Website :", font=FONT, padx=5, pady=5)
+website_label = Label(text ="Website :", font=NORMAL_FONT, padx=5, pady=5)
 website_label.grid(column=0, row=1)
-email_label = Label(text ="Email/Username :", font=FONT, padx=5, pady=5)
+email_label = Label(text ="Email/Username :", font=NORMAL_FONT, padx=5, pady=5)
 email_label.grid(column=0, row=2)
-password_label = Label(text ="Password :", font=FONT, padx=5, pady=5)
+password_label = Label(text ="Password :", font=NORMAL_FONT, padx=5, pady=5)
 password_label.grid(column=0, row=3)
 
 # Entry
-website_text = Entry(width=45, font=ENTRY_FONT)
-website_text.grid(column=1, row=1, columnspan=2)
+website_text = Entry(width=27, font=ENTRY_TEXT_FONT)
+website_text.grid(column=1, row=1)
 website_text.focus()
-email_text = Entry(width=45, font=ENTRY_FONT)
+email_text = Entry(width=45, font=ENTRY_TEXT_FONT)
 email_text.grid(column=1, row=2, columnspan=2)
 email_text.insert(0, "mrvaghela@gmail.com")
-password_text = Entry(width=27, font=ENTRY_FONT)
+password_text = Entry(width=27, font=ENTRY_TEXT_FONT)
 password_text.grid(column=1, row=3)
 
 # Button
 generate_password_btn = Button(text="Generate Password", width=15, command=generate_password)
-generate_password_btn.grid(column=2, row=3,padx=5, pady=5)
+generate_password_btn.grid(column=2, row=3, padx=5, pady=5)
 add_btn = Button(text="Add", width=44, command=save)
-add_btn.grid(column=1, row=4, columnspan=2,padx=5, pady=5)
+add_btn.grid(column=1, row=4, columnspan=2, padx=5, pady=5)
+search_btn = Button(text="Search", width=15, command=find_password)
+search_btn.grid(column=2, row=1, padx=5, pady=5)
 
 window.mainloop()
