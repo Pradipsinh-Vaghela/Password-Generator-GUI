@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 from random import randint, choice, shuffle
 import pyperclip
+import json
 
 FONT = ("Times of New Roman",12)
 ENTRY_FONT = ("Times of New Roman",10)
@@ -30,6 +31,13 @@ def save():
     email = email_text.get()
     password = password_text.get()
 
+    new_data = {
+        website : {
+            "email" : email,
+            "password" : password,
+        }
+    }
+
     if website == "" or email == "" or password == "":
         messagebox.showwarning(title="Oops", message="Please Don't leave any fields empty!")
 
@@ -39,8 +47,22 @@ def save():
                                                    f"Is it ok to save?")
 
         if is_ok:
-            with open("data.txt", mode="a") as data_file:
-                data_file.write(f"{website} | {email} | {password}\n")
+            try:
+                with open("data.json", "r") as data_file:
+                    # Reading old data
+                    data = json.load(data_file)
+            except FileNotFoundError:
+                with open("data.json", "w") as data_file:
+                    json.dump(new_data, data_file, indent=4)
+            else:
+                # Updating old data with new data
+                data.update(new_data)
+
+                with open("data.json", "w") as data_file:
+                    # Saving Updated data
+                    json.dump(data, data_file, indent=4)
+            finally:
+                # Clear the text boxes
                 website_text.delete(0,END)
                 password_text.delete(0,END)
 
